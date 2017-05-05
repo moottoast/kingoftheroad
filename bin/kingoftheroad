@@ -2,40 +2,43 @@
 
 require 'optparse'
 require 'methadone'
+require 'json'
+require 'aws-sdk'
+require 'csv'
 require 'kingoftheroad.rb'
 
 class App
   include Methadone::Main
   include Methadone::CLILogging
 
-  main do # Add args you want: |like,so|
-    # your program code here
-    # You can access CLI options via
-    # the options Hash
+  def get_hosted_zone_id(name, hosted_zones)
+    hosted_zones.each do |hosted_zone|
+      if name == hosted_zone.name
+        hosted_zone.id
+      end
+    end
   end
 
-  # supplemental methods here
+  main do |zone_file, credential_file|
+    credential_array = CSV.read(credential_file)
 
-  # Declare command-line interface here
+    route53 = Aws::Route53::Client.new(
+      region: 'us-east-1',
+      access_key_id: "#{credential_array[1][0]}",
+      secret_access_key: "#{credential_array[1][1]}"
+      )
 
-  # description "one line description of your app"
-  #
-  # Accept flags via:
-  # on("--flag VAL","Some flag")
-  # options[flag] will contain VAL
-  #
-  # Specify switches via:
-  # on("--[no-]switch","Some switch")
-  #
-  # Or, just call OptionParser methods on opts
-  #
-  # Require an argument
-  # arg :some_arg 
-  #
-  # # Make an argument optional
-  # arg :optional_arg, :optional
+    hosted_zones =  route53.list_hosted_zones.hosted_zones
 
-  version Kingoftheroad::VERSION
+    puts get_hosted_zone_id("vector-solutions.com.", hosted_zones)
+  end
+
+
+  
+version Kingoftheroad::VERSION
+  
+  arg :zone_file, "A column delimited zone file with DNS records exported for a domain"
+  arg :credential_file, "An AWS-specific csv file with an access key and secret"
 
   use_log_level_option :toggle_debug_on_signal => 'USR1'
 
