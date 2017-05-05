@@ -5,6 +5,7 @@ require 'methadone'
 require 'json'
 require 'aws-sdk'
 require 'csv'
+require 'kingoftheroad/credential'
 require 'kingoftheroad.rb'
 
 class App
@@ -20,17 +21,17 @@ class App
   end
 
   main do |zone_file, credential_file|
-    credential_array = CSV.read(credential_file)
+    credential = Credential.new(credential_file)
 
     route53 = Aws::Route53::Client.new(
       region: 'us-east-1',
-      access_key_id: "#{credential_array[1][0]}",
-      secret_access_key: "#{credential_array[1][1]}"
+      access_key_id: "#{credential.access_key_id}",
+      secret_access_key: "#{credential.secret_access_key}"
       )
 
     hosted_zones =  route53.list_hosted_zones.hosted_zones
 
-    puts get_hosted_zone_id("vector-solutions.com.", hosted_zones)
+    puts hosted_zones
   end
 
 
