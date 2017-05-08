@@ -15,7 +15,7 @@ module Route53
     id = false
     Route53.hosted_zones(credential).each do |hosted_zone|
       if name == hosted_zone.name
-        id =  hosted_zone.id
+        id =  hosted_zone.id.split('/')[-1]
       end
     end
     id
