@@ -18,11 +18,33 @@ class App
   main do |zone_file, credential_file|
     credential = Credential.new(credential_file)
 
-    # puts Route53.get_hosted_zone_id('redvector.com.', credential)
-
     parsed_zone_file =  ZoneFile.new(zone_file).parse
-    parsed_zone_file.each do |row|
-      puts "#{row}"
+    parsed_zone_file.each do |zone|
+      zone_id =  Route53.get_hosted_zone_id(zone[0], credential)
+      if zone_id == false
+        puts "Zone #{zone[0]} does not exist in AWS Route 53"
+      else
+        zone[1].each do |record|
+          if record[0] == zone[0] && record[3] == 'NS'
+            puts "Zone #{zone[0]} - ignoring NS record for same zone"
+          else
+            case record[3]
+            when 'A'
+              puts "Zone #{zone[0]} - creating A record"
+            when 'MX'
+              puts "Zone #{zone[0]} - creating MX record"
+            when 'TXT'
+              puts "Zone #{zone[0]} - creating TXT record"
+            when 'CNAME'
+              puts "Zone #{zone[0]} - creating CNAME record"
+            when 'SRV'
+              puts "Zone #{zone[0]} - creating SRV record"
+            else
+              puts "Zone #{zone[0]} - ignoring #{record[3]} record (don't know what to do)"
+            end
+          end
+        end
+      end
     end
   end
 
