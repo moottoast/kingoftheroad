@@ -8,6 +8,7 @@ require 'csv'
 require 'kingoftheroad.rb'
 require 'kingoftheroad/credential'
 require 'kingoftheroad/route53'
+require 'kingoftheroad/zone_file'
 require 'byebug'
 
 class App
@@ -17,7 +18,12 @@ class App
   main do |zone_file, credential_file|
     credential = Credential.new(credential_file)
 
-    puts Route53.get_hosted_zone_id('redvector.com.', credential)
+    # puts Route53.get_hosted_zone_id('redvector.com.', credential)
+
+    parsed_zone_file =  ZoneFile.new(zone_file).parse
+    parsed_zone_file.each do |row|
+      puts "#{row}"
+    end
   end
 
 
