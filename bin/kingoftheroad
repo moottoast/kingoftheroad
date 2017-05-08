@@ -5,33 +5,19 @@ require 'methadone'
 require 'json'
 require 'aws-sdk'
 require 'csv'
-require 'kingoftheroad/credential'
 require 'kingoftheroad.rb'
+require 'kingoftheroad/credential'
+require 'kingoftheroad/route53'
+require 'byebug'
 
 class App
   include Methadone::Main
   include Methadone::CLILogging
 
-  def get_hosted_zone_id(name, hosted_zones)
-    hosted_zones.each do |hosted_zone|
-      if name == hosted_zone.name
-        hosted_zone.id
-      end
-    end
-  end
-
   main do |zone_file, credential_file|
     credential = Credential.new(credential_file)
 
-    route53 = Aws::Route53::Client.new(
-      region: 'us-east-1',
-      access_key_id: "#{credential.access_key_id}",
-      secret_access_key: "#{credential.secret_access_key}"
-      )
-
-    hosted_zones =  route53.list_hosted_zones.hosted_zones
-
-    puts hosted_zones
+    puts Route53.get_hosted_zone_id('redvector.com.', credential)
   end
 
 
