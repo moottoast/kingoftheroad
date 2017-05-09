@@ -20,4 +20,28 @@ module Route53
     end
     id
   end
+
+  def Route53.change_record(credential, id, host, type, ttl, value)
+    Route53.client(credential).change_resource_record_sets({
+      change_batch: {
+        changes: [
+          {
+            action: "UPSERT",
+            resource_record_set: {
+              name: "#{host}",
+              resource_records: [
+                {
+                  value: "#{value}"
+                },
+              ],
+              ttl: "#{ttl}",
+              type: "#{type}"
+            },
+          },
+        ],
+        comment: '',
+      },
+      hosted_zone_id: "#{id}"
+    })
+  end
 end

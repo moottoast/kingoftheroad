@@ -30,15 +30,50 @@ class App
           else
             case record[3]
             when 'A'
-              puts "Zone #{zone[0]} - creating A record"
+              puts "Zone #{zone[0]} - creating A record for #{record[0]}"
+              Route53.change_record(
+                credential,
+                zone_id,
+                record[0],
+                'A',
+                record[1],
+                record[4])
             when 'MX'
-              puts "Zone #{zone[0]} - creating MX record"
+              puts "Zone #{zone[0]} - creating A record for #{record[0]}"
+              Route53.change_record(
+                credential,
+                zone_id,
+                record[0],
+                'MX',
+                record[1],
+                "#{record[4]} #{record[5]}")
             when 'TXT'
-              puts "Zone #{zone[0]} - creating TXT record"
+              puts "Zone #{zone[0]} - creating A record for #{record[0]}"
+              Route53.change_record(
+                credential,
+                zone_id,
+                record[0],
+                'TXT',
+                record[1],
+                "\"#{record[4]}\"")
             when 'CNAME'
-              puts "Zone #{zone[0]} - creating CNAME record"
+              puts "Zone #{zone[0]} - creating A record for #{record[0]}"
+              Route53.change_record(
+                credential,
+                zone_id,
+                record[0],
+                'CNAME',
+                record[1],
+                record[4])
             when 'SRV'
-              puts "Zone #{zone[0]} - creating SRV record"
+              puts "Zone #{zone[0]} - creating A record for #{record[0]}"
+              Route53.change_record(
+                credential,
+                zone_id,
+                record[0],
+                'SRV',
+                record[1],
+                "#{record[4]} #{record[5]} #{record[6]} #{record[7]}")
             else
               puts "Zone #{zone[0]} - ignoring #{record[3]} record (don't know what to do)"
             end
